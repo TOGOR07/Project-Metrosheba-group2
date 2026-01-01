@@ -1,15 +1,24 @@
 <?php
+session_start();
+require_once("../models/pessengerdashboardticket.php");
 
 $fromStation = $toStation = $quantity = "";
 $errors = [];
 $successMessage = "";
 
+$stations = [
+    "Uttara North", "Uttara Center", "Uttara South", 
+    "Pallabi", "Mirpur 11", "Mirpur 10", 
+    "Kazipara", "Shewrapara", "Agargaon", 
+    "Bijoy Sarani", "Farmgate", "Karwan Bazar", 
+    "Shahbag", "Dhaka University", "Motijheel"
+];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $fromStation = isset($_POST['from_station']) ? htmlspecialchars($_POST['from_station']) : '';
-    $toStation = isset($_POST['to_station']) ? htmlspecialchars($_POST['to_station']) : '';
-    $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
+    $toStation   = isset($_POST['to_station']) ? htmlspecialchars($_POST['to_station']) : '';
+    $quantity    = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
 
     if (empty($fromStation) || empty($toStation)) {
         $errors[] = "Please select both 'From' and 'To' stations.";
@@ -25,10 +34,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($errors)) {
 
-        $successMessage = "Success! You purchased $quantity ticket(s) from $fromStation to $toStation.";
+        $fromIndex = array_search($fromStation, $stations);
+        $toIndex   = array_search($toStation, $stations);
 
-        // $fromStation = $toStation = "";
-        // $quantity = 1;
+        $stationsPassed = abs($toIndex - $fromIndex);
+        $perPrice = $stationsPassed * 10;
+        if ($perPrice < 20) $perPrice = 20;
+
+        $totalPrice = $perPrice * $quantity;
+
+        $username = $_SESSION['username'] ?? "";
+
+        if (empty($username)) {
+            $errors[] = "User not found in session! Please login again.";
+        } else {
+
+            $ticketModel = new PassengerDashboardTicket();
+            $insert = $ticketModel->insertTicket($username, $fromStation, $toStation, $quantity, $perPrice, $totalPrice);
+
+            if ($insert) {
+                $successMessage = "Success! You purchased $quantity ticket(s) from $fromStation to $toStation.";
+            } else {
+                $errors[] = "Database Error! Ticket purchase failed.";
+            }
+        }
     }
 }
 ?>

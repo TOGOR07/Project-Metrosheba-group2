@@ -1,16 +1,26 @@
 <?php
 session_start();
+require_once("../models/editprofiledetailsdb.php");
 
 $name = $email = $mobile = $dob = $gender = "";
 $errors = [];
 
-if (isset($_SESSION['user_data'])) {
-    $data = $_SESSION['user_data'];
-    $name = $data['name'] ?? "";
-    $email = $data['email'] ?? "";
-    $mobile = $data['mobile'] ?? "";
-    $dob = $data['dob'] ?? "";
-    $gender = $data['gender'] ?? "";
+
+$username = $_SESSION['username'] ?? "";
+
+if (empty($username)) {
+    header("Location: Login.php");
+    exit();
+}
+
+$userData = getUserByUsername($username);
+
+if ($userData) {
+    $name = $userData['name'] ?? "";
+    $email = $userData['email'] ?? "";
+    $mobile = $userData['mobilenum'] ?? "";  
+    $dob = $userData['dob'] ?? "";
+    $gender = $userData['gender'] ?? "";
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -51,19 +61,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($errors)) {
 
-        $current_data = isset($_SESSION['user_data']) ? $_SESSION['user_data'] : [];
+        $update = updateUserProfileByUsername($username, $name, $email, $mobile, $dob, $gender);
 
-        $_SESSION['user_data'] = array_merge($current_data, [
-            'name' => $name,
-            'email' => $email,
-            'mobile' => $mobile,
-            'dob' => $dob,
-            'gender' => $gender,
-            'nid' => $current_data['nid'] ?? 'Not Set'
-        ]);
+        if ($update) {
 
-        header("Location: PassengerProfile.php");
-        exit();
+            $_SESSION['username'] = $name;
+
+            header("Location: PassengerProfile.php");
+            exit();
+        } else {
+            $errors['db'] = "Database update failed!";
+        }
     }
 }
 ?>
