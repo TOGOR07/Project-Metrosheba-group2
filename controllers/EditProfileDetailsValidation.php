@@ -2,76 +2,92 @@
 session_start();
 require_once("../models/editprofiledetailsdb.php");
 
-$name = $email = $mobile = $dob = $gender = "";
+$name = $email = $mobile = $dob = $nid = $gender = "";
 $errors = [];
 
+$sessionName = $_SESSION['username'] ?? "";
 
-$username = $_SESSION['username'] ?? "";
-
-if (empty($username)) {
+if (empty($sessionName)) {
     header("Location: Login.php");
     exit();
 }
 
-$userData = getUserByUsername($username);
+$user = getUserBySessionName($sessionName);
 
-if ($userData) {
-    $name = $userData['name'] ?? "";
-    $email = $userData['email'] ?? "";
-    $mobile = $userData['mobilenum'] ?? "";  
-    $dob = $userData['dob'] ?? "";
-    $gender = $userData['gender'] ?? "";
+if ($user) {
+    $name = $user['name'];
+    $email = $user['email'];
+    $mobile = $user['mobile_number'];
+    $nid = $user['nid'];
+    $gender = $user['gender'];
+    $dob = date("Y-m-d", strtotime($user['dob']));
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    if (empty($_POST["name"])) {
-        $errors['name'] = "Name is required";
-    } else {
-        $name = htmlspecialchars($_POST["name"]);
-    }
+    $newName = trim($_POST["name"] ?? "");
+    $newEmail = trim($_POST["email"] ?? "");
+    $newMobile = trim($_POST["mobile"] ?? "");
+    $newDob = trim($_POST["dob"] ?? "");
+    $newNid = trim($_POST["nid"] ?? "");
+    $newGender = trim($_POST["gender"] ?? "");
+    $newPassword = trim($_POST["password"] ?? "");
 
-    if (empty($_POST["email"])) {
-        $errors['email'] = "Email is required";
-    } elseif (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = "Invalid email format";
-    } else {
-        $email = htmlspecialchars($_POST["email"]);
-    }
+    if ($newName === "") $errors['name'] = "Name is required";
 
-    if (empty($_POST["mobile"])) {
-        $errors['mobile'] = "Mobile number is required";
-    } elseif (!is_numeric($_POST["mobile"])) {
-        $errors['mobile'] = "Mobile number must be numeric";
-    } else {
-        $mobile = htmlspecialchars($_POST["mobile"]);
-    }
+    if ($newEmail === "") $errors['email'] = "Email is required";
+    else if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) $errors['email'] = "Invalid email format";
 
-    if (empty($_POST["dob"])) {
-        $errors['dob'] = "Date of Birth is required";
-    } else {
-        $dob = htmlspecialchars($_POST["dob"]);
-    }
+    if ($newMobile === "") $errors['mobile'] = "Mobile number is required";
+    else if (!ctype_digit($newMobile) || strlen($newMobile) !== 11) $errors['mobile'] = "Mobile must be 11 digits";
 
-    if (empty($_POST["gender"])) {
-        $errors['gender'] = "Gender is required";
-    } else {
-        $gender = htmlspecialchars($_POST["gender"]);
-    }
+    if ($newDob === "") $errors['dob'] = "Date of Birth is required";
+
+    if ($newNid === "") $errors['nid'] = "NID is required";
+    else if (!ctype_digit($newNid)) $errors['nid'] = "NID must be numeric";
+
+    if ($newGender === "") $errors['gender'] = "Gender is required";
 
     if (empty($errors)) {
 
-        $update = updateUserProfileByUsername($username, $name, $email, $mobile, $dob, $gender);
+        $newDob = $newDob . " 00:00:00";
 
-        if ($update) {
+        $passwordToUpdate = null;
+        if ($newPassword !== "") {
+            if (strlen($newPassword) < 8) {
+                $errors['password'] = "Password must be at least 8 characters";
+            } else {
+                $passwordToUpdate = $newPassword;
+            }
+        }
 
-            $_SESSION['username'] = $name;
+        if (empty($errors)) {
+            $update = updateUserDetails(
+                $sessionName,
+                $newName,
+                $newEmail,
+                $newMobile,
+                $newDob,
+                $newNid,
+                $newGender,
+                $passwordToUpdate
+            );
 
-            header("Location: PassengerProfile.php");
-            exit();
-        } else {
-            $errors['db'] = "Database update failed!";
+            if ($update) {
+                $_SESSION['username'] = $newName;
+                header("Location: PassengerProfile.php");
+                exit();
+            } else {
+                $errors['db'] = "Database update failed!";
+            }
         }
     }
+
+    $name = $newName;
+    $email = $newEmail;
+    $mobile = $newMobile;
+    $dob = $newDob;
+    $nid = $newNid;
+    $gender = $newGender;
 }
 ?>

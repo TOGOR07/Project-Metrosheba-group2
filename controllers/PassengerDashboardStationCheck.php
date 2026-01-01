@@ -1,31 +1,40 @@
 <?php
-session_start();
-require_once("../models/pessengerdashboardticket.php");
+require_once("../models/passengerdashboardticketdb.php");
 
-$fromStation = $toStation = $quantity = "";
+$fromStation = $toStation = "";
+$quantity = 1;
 $errors = [];
 $successMessage = "";
+$totalPrice = 0;
+$perPrice = 0;
+
+$username = $_SESSION["username"] ?? "";
+
+if (empty($username)) {
+    header("Location: Login.php");
+    exit();
+}
 
 $stations = [
-    "Uttara North", "Uttara Center", "Uttara South", 
-    "Pallabi", "Mirpur 11", "Mirpur 10", 
-    "Kazipara", "Shewrapara", "Agargaon", 
-    "Bijoy Sarani", "Farmgate", "Karwan Bazar", 
+    "Uttara North", "Uttara Center", "Uttara South",
+    "Pallabi", "Mirpur 11", "Mirpur 10",
+    "Kazipara", "Shewrapara", "Agargaon",
+    "Bijoy Sarani", "Farmgate", "Karwan Bazar",
     "Shahbag", "Dhaka University", "Motijheel"
 ];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $fromStation = isset($_POST['from_station']) ? htmlspecialchars($_POST['from_station']) : '';
-    $toStation   = isset($_POST['to_station']) ? htmlspecialchars($_POST['to_station']) : '';
-    $quantity    = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
+    $fromStation = trim($_POST['from_station'] ?? "");
+    $toStation = trim($_POST['to_station'] ?? "");
+    $quantity = (int)($_POST['quantity'] ?? 1);
 
     if (empty($fromStation) || empty($toStation)) {
         $errors[] = "Please select both 'From' and 'To' stations.";
     }
 
-    if ($fromStation === $toStation && !empty($fromStation)) {
-        $errors[] = "Departure and Destination stations cannot be the same.";
+    if ($fromStation === $toStation) {
+        $errors[] = "From and To station cannot be same.";
     }
 
     if ($quantity < 1 || $quantity > 10) {
@@ -35,27 +44,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($errors)) {
 
         $fromIndex = array_search($fromStation, $stations);
-        $toIndex   = array_search($toStation, $stations);
+        $toIndex = array_search($toStation, $stations);
 
-        $stationsPassed = abs($toIndex - $fromIndex);
-        $perPrice = $stationsPassed * 10;
-        if ($perPrice < 20) $perPrice = 20;
-
-        $totalPrice = $perPrice * $quantity;
-
-        $username = $_SESSION['username'] ?? "";
-
-        if (empty($username)) {
-            $errors[] = "User not found in session! Please login again.";
+        if ($fromIndex === false || $toIndex === false) {
+            $errors[] = "Invalid station selected!";
         } else {
 
-            $ticketModel = new PassengerDashboardTicket();
-            $insert = $ticketModel->insertTicket($username, $fromStation, $toStation, $quantity, $perPrice, $totalPrice);
+            $stationsPassed = abs($toIndex - $fromIndex);
+            $perPrice = $stationsPassed * 10;
+            if ($perPrice < 20) $perPrice = 20;
+
+            $totalPrice = $perPrice * $quantity;
+
+            $insert = insertTicket($username, $fromStation, $toStation, $quantity, $perPrice, $totalPrice);
 
             if ($insert) {
-                $successMessage = "Success! You purchased $quantity ticket(s) from $fromStation to $toStation.";
+                $successMessage = "Success! Ticket purchased successfully.";
+                $fromStation = $toStation = "";
+                $quantity = 1;
+                $totalPrice = 0;
+                $perPrice = 0;
             } else {
-                $errors[] = "Database Error! Ticket purchase failed.";
+                $errors[] = "Database Insert Failed!";
             }
         }
     }

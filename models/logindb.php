@@ -1,18 +1,15 @@
 <?php
 require_once("db.php");
 
-function getPassengerProfileByUsername($username)
+function getUserByUsername($username)
 {
     global $conn;
 
-    $query = "SELECT name, email, mobile_number, gender, nid, dob 
-              FROM users 
-              WHERE name = ? LIMIT 1";
-
+    $query = "SELECT * FROM users WHERE name = ? LIMIT 1";
     $stmt = mysqli_prepare($conn, $query);
 
     if (!$stmt) {
-        die("Prepare Failed (PassengerProfile): " . mysqli_error($conn));
+        die("Prepare Failed (Login): " . mysqli_error($conn));
     }
 
     mysqli_stmt_bind_param($stmt, "s", $username);

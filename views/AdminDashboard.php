@@ -1,5 +1,5 @@
 <?php
-//require_once("../controllers/AdminDashboardAuthCheck.php");
+require_once("../controllers/AdminDashboardAuthCheck.php");
 
 $stats = [
     'total_tickets' => 1250,

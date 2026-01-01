@@ -16,7 +16,6 @@ require_once("../controllers/PassengerProfileValidation.php");
 
         .left-section {
             flex: 1;
-            background-color: #333;
             background-image: url('../assets/342.jpg'); 
             background-size: cover;
             background-position: center;
@@ -46,13 +45,8 @@ require_once("../controllers/PassengerProfileValidation.php");
             margin-bottom: 40px;
         }
         .header-left { display: flex; align-items: center; gap: 20px; }
-        .back-btn {
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; text-decoration: none; transition: 0.3s;
-            padding: 5px; border-radius: 50%;
-        }
         .back-btn img { width: 24px; height: 24px; }
-        .back-btn:hover { background-color: #f0f0f0; }
+
         .page-title { font-size: 32px; font-weight: bold; }
 
         .profile-img-container {
@@ -62,26 +56,20 @@ require_once("../controllers/PassengerProfileValidation.php");
             width: 80px; height: 80px; border-radius: 50%;
             object-fit: cover; border: 3px solid #ddd;
         }
-        .change-photo-btn {
-            font-size: 12px; color: #b05b5b; font-weight: bold;
-            text-decoration: none; cursor: pointer; border: 1px solid #b05b5b;
-            padding: 4px 8px; border-radius: 4px; transition: 0.3s;
-        }
-        .change-photo-btn:hover { background-color: #b05b5b; color: white; }
 
         .profile-info { display: flex; flex-direction: column; gap: 25px; }
         .info-group { display: flex; flex-direction: column; }
         .label { font-size: 14px; color: #666; margin-bottom: 5px; }
         .value {
             font-size: 18px; font-weight: bold; color: #000;
-            padding: 5px 0; border-bottom: 1px solid #eee; min-height: 30px;
+            padding: 5px 0; border-bottom: 1px solid #eee;
         }
 
         .edit-btn {
             margin-top: 40px; background-color: #b05b5b; color: white;
-            padding: 15px; border: none; border-radius: 8px; font-size: 18px;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
-            width: 200px; text-align: center; text-decoration: none; display: block; 
+            padding: 15px; border: none; border-radius: 8px;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            width: 200px; text-align: center; text-decoration: none;
         }
         .edit-btn:hover { background-color: #8e4747; }
     </style>
@@ -101,7 +89,6 @@ require_once("../controllers/PassengerProfileValidation.php");
             
             <div class="profile-img-container">
                 <img src="<?php echo $profile_image; ?>" alt="User" class="user-avatar">
-                <a href="EditProfilePicture.php" class="change-photo-btn">Change Photo</a>
             </div>
         </div>
 
@@ -110,22 +97,27 @@ require_once("../controllers/PassengerProfileValidation.php");
                 <span class="label">Name</span>
                 <span class="value"><?php echo $name; ?></span>
             </div>
+
             <div class="info-group">
                 <span class="label">Email</span>
                 <span class="value"><?php echo $email; ?></span>
             </div>
+
             <div class="info-group">
                 <span class="label">Mobile Number</span>
                 <span class="value"><?php echo $mobile; ?></span>
             </div>
+
             <div class="info-group">
                 <span class="label">Gender</span>
                 <span class="value"><?php echo $gender; ?></span>
             </div>
+
             <div class="info-group">
                 <span class="label">NID Number</span>
                 <span class="value"><?php echo $nid; ?></span>
             </div>
+
             <div class="info-group">
                 <span class="label">Date-Of-Birth</span>
                 <span class="value"><?php echo $dob; ?></span>

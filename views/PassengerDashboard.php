@@ -1,8 +1,6 @@
 <?php
-//require_once("../controllers/PassengerDashboardAuthCheck.php");
+require_once("../controllers/PassengerDashboardAuthCheck.php");
 require_once("../controllers/PassengerDashboardStationCheck.php");
-
-
 ?>
 
 <!DOCTYPE html>
@@ -14,13 +12,21 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
     
     <style>
         @font-face { font-family: 'Poppins'; src: url('../assets/Poppins/Poppins-Regular.ttf') format('truetype'); }
-        :root { --primary-color: #c06c6c; --primary-dark: #a05555; --light-bg: #f4f7f6; --text-dark: #333; --white: #ffffff; }
+        :root { 
+            --primary-color: #c06c6c; 
+            --primary-dark: #a05555; 
+            --light-bg: #f4f7f6; 
+            --text-dark: #333; 
+            --white: #ffffff; 
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', Arial, sans-serif; }
         body { background-color: var(--light-bg); display: flex; min-height: 100vh; }
         
         .sidebar { width: 260px; background-color: var(--white); box-shadow: 2px 0 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
         .logo-box { background-color: var(--primary-color); padding: 20px; color: var(--white); display: flex; align-items: center; gap: 15px; }
         .logo-img { width: 40px; height: 40px; border-radius: 5px; object-fit: contain; background: white; padding: 2px; }
+        
         .menu { margin-top: 20px; }
         .menu a { display: flex; align-items: center; padding: 15px 25px; color: var(--text-dark); text-decoration: none; transition: 0.3s; font-weight: 600; font-size: 15px; }
         .menu-icon { width: 24px; height: 24px; margin-right: 15px; object-fit: contain; opacity: 0.7; }
@@ -28,20 +34,38 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
         .menu a:hover, .menu a.active { background-color: #fcebeb; color: var(--primary-color); border-left: 5px solid var(--primary-color); }
         
         .main-content { flex: 1; display: flex; flex-direction: column; }
-        .header { background-color: var(--primary-color); color: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; height: 70px; }
-        .user-info { display: flex; align-items: center; gap: 10px; text-align: right; }
-        .profile-icon { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; margin-left: 10px; background: white; }
+        .header { 
+            background-color: var(--primary-color); 
+            color: var(--white); 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            height: 70px; 
+        }
+
+        .welcome-text{
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .welcome-text span{
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
         .dashboard-container { padding: 30px; display: flex; gap: 30px; height: calc(100vh - 70px); }
         
         .booking-card { flex: 2; background: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; }
         .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
         .form-group { flex: 1; }
+        
         label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); }
         select, input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; transition: 0.3s; }
         select:focus, input:focus { border-color: var(--primary-color); box-shadow: 0 0 5px rgba(192, 108, 108, 0.3); }
+        
         .price-info { background: #fff8f8; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px dashed var(--primary-color); }
         .notice { color: red; font-size: 12px; margin-top: 5px; font-weight: 500; }
-        
+
         .btn-confirm { background-color: var(--primary-color); color: white; border: none; padding: 15px; font-size: 18px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-top: 20px; transition: 0.3s; width: 100%; }
         .btn-confirm:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
         
@@ -56,6 +80,7 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
         .success-box { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #4caf50; }
     </style>
 </head>
+
 <body>
 
     <div class="sidebar">
@@ -67,20 +92,17 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
             <a href="#" class="active"><img src="../assets/dashboard.png" class="menu-icon" alt="Dashboard"> Dashboard</a>
             <a href="PassengerProfile.php"><img src="../assets/user.png" class="menu-icon" alt="Profile"> View Profile</a>
             <a href="EditProfileDetails.php"><img src="../assets/edit.png" class="menu-icon" alt="Edit"> Edit Profile</a>
-            <a href="#"><img src="../assets/key.png" class="menu-icon" alt="Password"> Update Password</a>
-            <a href="#"><img src="../assets/logout.png" class="menu-icon" alt="Logout"> Logout</a>
+            <a href="EditProfileDetails.php"><img src="../assets/key.png" class="menu-icon" alt="Password"> Update Password</a>
+            <a href="../controllers/logout.php"><img src="../assets/logout.png" class="menu-icon" alt="Logout"> Logout</a>
         </div>
     </div>
 
     <div class="main-content">
         <div class="header">
             <h2>Passenger Dashboard</h2>
-            <div class="user-info">
-                <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 600;" id="header_user_name"></span>
-                    <small id="header_user_role"></small>
-                </div>
-                <img src="../assets/user.png" alt="Profile" class="profile-icon">
+
+            <div class="welcome-text">
+                Welcome, <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
             </div>
         </div>
 
@@ -100,7 +122,7 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                <form method="POST" action="">
                     <div class="form-row">
                         <div class="form-group">
                             <label>From Station</label>
@@ -118,7 +140,11 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
 
                     <div class="form-group">
                         <label>Total Quantity</label>
-                        <input type="number" id="quantity" name="quantity" value="<?php echo $quantity > 0 ? $quantity : 1; ?>" min="1" max="10" onchange="calculatePrice()" oninput="calculatePrice()">
+                        <input type="number" id="quantity" name="quantity"
+                               value="<?php echo $quantity > 0 ? $quantity : 1; ?>" 
+                               min="1" max="10" 
+                               onchange="calculatePrice()" 
+                               oninput="calculatePrice()">
                     </div>
 
                     <div class="price-info">
