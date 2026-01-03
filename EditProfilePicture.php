@@ -1,209 +1,84 @@
+<?php
+session_start();
+$error = "";
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+   
+    if (!isset($_FILES['profile_pic']) || $_FILES['profile_pic']['error'] != 0) {
+        $error = "Please select an image to upload.";
+    } else {
+        $file = $_FILES['profile_pic'];
+        
+        // ফাইলের তথ্য
+        $fileName = $file['name'];
+        $fileTmpName = $file['tmp_name'];
+        $fileSize = $file['size'];
+        
+        
+        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+       
+        $allowedExt = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (!in_array($fileExt, $allowedExt)) {
+            $error = "Invalid file type! Only JPG, JPEG, PNG, & GIF allowed.";
+        } elseif ($fileSize > 2097152) { 
+            $error = "File size must be less than 2MB.";
+        } else {
+            
+            $newFileName = "profile_" . time() . "." . $fileExt;
+            $destination = "assets/" . $newFileName;
+
+            if (move_uploaded_file($fileTmpName, $destination)) {
+                
+                
+                
+                $current_data = isset($_SESSION['user_data']) ? $_SESSION['user_data'] : [];
+                $_SESSION['user_data'] = array_merge($current_data, ['profile_image' => $destination]);
+
+               
+                header("Location: PassengerProfile.php");
+                exit();
+            } else {
+                $error = "Failed to upload image.";
+            }
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change Photo - Metroseba</title>
+    <title>Change Profile Photo - Metroseba</title>
     <style>
-       
-        @font-face {
-            font-family: 'Poppins';
-            src: url('assets/Poppins/Poppins-Regular.ttf') format('truetype');
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f4f4f4;
-        }
-
-        
-        .container {
-            background: white;
-            width: 100%;
-            max-width: 450px;
-            height: 100vh; 
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-
-        
-        .header {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        .back-btn {
-            position: absolute;
-            left: 20px;
-            cursor: pointer;
-            padding: 5px; 
-        }
-        
-        .back-btn img {
-            width: 24px;
-        }
-
-        .app-title {
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            gap: 30px;
-        }
-
-        .page-heading {
-            font-size: 22px;
-            font-weight: 500;
-        }
-
-        
-        .image-preview-box {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 5px solid #a8dadc;
-            background-color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .image-preview-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 250px;
-            align-items: center;
-        }
-
-        
-        .file-upload-btn {
-            background: white;
-            border: 1px solid #ccc;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .file-upload-btn:hover {
-            background-color: #f9f9f9;
-        }
-
-       
-        input[type="file"] {
-            display: none;
-        }
-
-        
-        .confirm-btn {
-            background-color: #b05b5b;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        .confirm-btn:hover {
-            background-color: #8f4747;
-        }
-
+        @font-face { font-family: 'Poppins'; src: url('assets/Poppins/Poppins-Regular.ttf') format('truetype'); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 400px; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center; }
+        .title { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .file-input { margin-bottom: 20px; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .upload-btn { background-color: black; color: white; width: 100%; padding: 12px; border: none; border-radius: 25px; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .upload-btn:hover { opacity: 0.8; }
+        .back-link { margin-top: 15px; display: block; color: #555; text-decoration: none; font-size: 14px; }
+        .error-msg { color: red; font-size: 14px; margin-bottom: 15px; display: block; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        
-        <div class="header">
-            <a href="PassengerProfile.html" class="back-btn">
-                <img src="assets/arrow.png" alt="Back">
-            </a>
-            <div class="app-title">METROSEHBA</div>
-        </div>
+        <div class="title">Change Profile Photo</div>
 
-        <div class="content">
-            <div class="page-heading">Change Photo</div>
+        <?php if (!empty($error)) echo "<span class='error-msg'>$error</span>"; ?>
 
-            <div class="image-preview-box">
-                <img src="assets/user.png" id="previewImage" alt="Profile Preview">
-            </div>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="profile_pic" class="file-input" accept="image/*">
+            <button type="submit" class="upload-btn">Upload Photo</button>
+        </form>
 
-            <div class="btn-group">
-                <label for="fileInput" class="file-upload-btn">
-                    Choose Image
-                </label>
-                <input type="file" id="fileInput" accept="image/*" onchange="loadFile(event)">
-
-                <button class="confirm-btn" onclick="saveImage()">Confirm</button>
-            </div>
-        </div>
+        <a href="PassengerProfile.php" class="back-link">Cancel and Go Back</a>
     </div>
-
-    <script>
-        function loadFile(event) {
-            var output = document.getElementById('previewImage');
-            if(event.target.files && event.target.files[0]) {
-                output.src = URL.createObjectURL(event.target.files[0]);
-                output.onload = function() {
-                    URL.revokeObjectURL(output.src) 
-                }
-            }
-        }
-
-        function saveImage() {
-            var fileInput = document.getElementById('fileInput');
-            
-            if(fileInput.files.length === 0) {
-                alert("Please choose an image first!");
-            } else {
-                alert("Profile picture updated successfully! (Database logic required)");
-                window.location.href = "PassengerProfile.html";
-            }
-        }
-    </script>
-
 </body>
 </html>

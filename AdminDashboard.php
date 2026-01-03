@@ -1,319 +1,162 @@
+<?php
+session_start();
+
+/*
+if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+    header("Location: login.php");
+    exit();
+}
+*/
+
+
+$stats = [
+    'total_tickets' => 1250,
+    'total_revenue' => 50000, // BDT
+    'total_profit' => 15000   // BDT
+];
+
+
+$customers = [
+    ['id' => 101, 'name' => 'Rahim Uddin', 'email' => 'rahim@gmail.com', 'phone' => '017XXXXXXXX', 'tickets' => 5, 'spent' => 250],
+    ['id' => 102, 'name' => 'Karim Ali', 'email' => 'karim@yahoo.com', 'phone' => '018XXXXXXXX', 'tickets' => 2, 'spent' => 100],
+    ['id' => 103, 'name' => 'Sultana Begum', 'email' => 'sultana@live.com', 'phone' => '019XXXXXXXX', 'tickets' => 10, 'spent' => 500],
+    ['id' => 104, 'name' => 'John Doe', 'email' => 'john@gmail.com', 'phone' => '016XXXXXXXX', 'tickets' => 1, 'spent' => 50],
+];
+
+// রিপোর্ট এক্সপোর্ট লজিক
+if (isset($_POST['export_report'])) {
+  
+    echo "<script>alert('Report Exported Successfully!');</script>";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Metroseba</title>
+    <title>Admin Dashboard - Metro Seba</title>
+    
     <style>
+        @font-face { font-family: 'Poppins'; src: url('assets/Poppins/Poppins-Regular.ttf') format('truetype'); }
+        :root { --primary-color: #2c3e50; /* অ্যাডমিনের জন্য একটু গাঢ় কালার */ --accent-color: #c06c6c; --light-bg: #f4f7f6; --white: #ffffff; }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', Arial, sans-serif; }
+        body { background-color: var(--light-bg); display: flex; min-height: 100vh; }
 
-        body {
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
+        .sidebar { width: 260px; background-color: var(--primary-color); color: var(--white); display: flex; flex-direction: column; }
+        .logo-box { padding: 20px; background-color: #1a252f; display: flex; align-items: center; gap: 15px; }
+        .logo-img { width: 40px; height: 40px; border-radius: 5px; background: white; padding: 2px; }
         
-        .top-header {
-            background-color: #b05b5b;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
+        .menu { margin-top: 20px; }
+        .menu a { display: flex; align-items: center; padding: 15px 25px; color: #ecf0f1; text-decoration: none; transition: 0.3s; font-size: 15px; }
+        .menu a:hover, .menu a.active { background-color: var(--accent-color); }
+        .menu-icon { width: 20px; margin-right: 15px; filter: invert(1); } /* আইকন সাদা করার জন্য */
 
-        .header-title {
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .admin-profile img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            filter: invert(1);
-        }
-
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background-color: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; height: 70px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        .container {
-            display: flex;
-            flex: 1;
-        }
+        .stats-container { padding: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .card { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--accent-color); }
+        .card h3 { font-size: 32px; color: var(--primary-color); margin-bottom: 5px; }
+        .card p { color: #777; font-size: 14px; font-weight: 600; }
 
+        .table-container { padding: 0 30px 30px; }
+        .table-card { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         
-        .sidebar {
-            width: 250px;
-            background-color: white;
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            border-right: 1px solid #ddd;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
+        th { background-color: #f8f9fa; color: var(--primary-color); font-weight: 600; }
+        tr:hover { background-color: #f1f1f1; }
 
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 15px;
-            text-decoration: none;
-            color: black;
-            font-weight: 600;
-            font-size: 16px;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
+        .btn-export { background-color: var(--accent-color); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .btn-export:hover { opacity: 0.8; }
 
-        .menu-item img {
-            width: 24px;
-            height: 24px;
-        }
-
-        .menu-item.active {
-            background-color: #b05b5b;
-            color: white;
-        }
-        
-        .menu-item.active img {
-            filter: invert(1) brightness(100); 
-        }
-
-        .menu-item:hover:not(.active) {
-            background-color: #f0f0f0;
-        }
-
-        
-        .main-content {
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            gap: 40px;
-        }
-
-        
-        .info-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid #ddd;
-            min-height: 180px; /* ডাটা না থাকলেও যেন সাইজ ঠিক থাকে */
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-weight: 500;
-            border-bottom: 1px solid #eee;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        
-        .data-value {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .right-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 450px;
-        }
-
-        
-        .stat-card {
-            padding: 25px;
-            border-radius: 10px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 18px;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .red-card {
-            background-color: #b05b5b;
-        }
-
-        .teal-card {
-            background-color: #5da39d;
-        }
-
-        .stat-number {
-            font-size: 24px;
-        }
-
-        
-        .export-btn {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 10px;
-            background: white;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .export-btn:hover {
-            background-color: #f9f9f9;
-            border-color: #b05b5b;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .export-btn h4 {
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .export-btn p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        
-        .logout-box {
-            margin-top: auto;
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
-            background: white;
-        }
-
-        .logout-btn {
-            background-color: #5da39d;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .logout-btn:hover {
-            background-color: #4a8b85;
-        }
+        .admin-info { display: flex; align-items: center; gap: 10px; }
+        .admin-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent-color); }
 
     </style>
 </head>
 <body>
 
-    <div class="top-header">
-        <div class="header-title">Admin Dashboard</div>
-        <div class="admin-profile">
-            <span>Admin</span>
-            <img src="assets/user.png" alt="Admin Icon">
+    <div class="sidebar">
+        <div class="logo-box">
+            <img src="assets/342.jpg" alt="Logo" class="logo-img">
+            <h3>Metro Admin</h3>
+        </div>
+        <div class="menu">
+            <a href="#" class="active"><img src="assets/dashboard.png" class="menu-icon"> Dashboard</a>
+            <a href="AdminProfile.php"><img src="assets/user.png" class="menu-icon"> View Profile</a>
+            <a href="EditAdminProfile.php"><img src="assets/edit.png" class="menu-icon"> Edit Profile</a>
+            <a href="#"><img src="assets/key.png" class="menu-icon"> Update Password</a>
+            <a href="#"><img src="assets/logout.png" class="menu-icon"> Logout</a>
         </div>
     </div>
 
-    <div class="container">
-        <div class="sidebar">
-            <a href="#" class="menu-item active">
-                <img src="assets/dashboard.png" alt="Dashboard">
-                Dashboard
-            </a>
-            <a href="#" class="menu-item">
-                <img src="assets/user.png" alt="Profile">
-                View Profile
-            </a>
-            <a href="#" class="menu-item">
-                <img src="assets/edit.png" alt="Edit">
-                Edit Profile
-            </a>
-            <a href="#" class="menu-item">
-                <img src="assets/password.png" alt="Password">
-                Update Password
-            </a>
-            <a href="#" class="menu-item">
-                <img src="assets/logout.png" alt="Logout">
-                Logout
-            </a>
+    <div class="main-content">
+        <div class="header">
+            <h2>Dashboard Overview</h2>
+            <div class="admin-info">
+                <div style="text-align: right;">
+                    <strong>Admin User</strong><br>
+                    <small style="color: gray;">Administrator</small>
+                </div>
+                <img src="assets/user.png" class="admin-avatar">
+            </div>
         </div>
 
-        <div class="main-content">
-            
-            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 400px;">
+        <div class="stats-container">
+            <div class="card">
+                <h3><?php echo $stats['total_tickets']; ?></h3>
+                <p>Total Sold Tickets</p>
+            </div>
+            <div class="card">
+                <h3><?php echo $stats['total_revenue']; ?> ৳</h3>
+                <p>Total Revenue</p>
+            </div>
+            <div class="card">
+                <h3><?php echo $stats['total_profit']; ?> ৳</h3>
+                <p>Total Profit</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-card">
+                <div class="table-header">
+                    <h3>Customer Information</h3>
+                    <form method="POST">
+                        <button type="submit" name="export_report" class="btn-export">Export Report</button>
+                    </form>
+                </div>
                 
-                <div class="info-card">
-                    <div class="info-row">
-                        <span>Customer Id</span> 
-                        <span class="data-value" id="customer-id">--</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Customer Name</span> 
-                        <span class="data-value" id="customer-name">--</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Customer Email</span> 
-                        <span class="data-value" id="customer-email">--</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Total booked Tickets</span> 
-                        <span class="data-value" id="customer-tickets">--</span>
-                    </div>
-                </div>
-
-                <button class="export-btn" onclick="generateReport()">
-                    <h4>Export Report</h4>
-                    <p>Click here to generate and view all customer information data from the database.</p>
-                </button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Booked Tickets</th>
+                            <th>Total Spent (BDT)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($customers as $customer): ?>
+                        <tr>
+                            <td>#<?php echo $customer['id']; ?></td>
+                            <td><?php echo $customer['name']; ?></td>
+                            <td><?php echo $customer['email']; ?></td>
+                            <td><?php echo $customer['phone']; ?></td>
+                            <td style="text-align: center;"><?php echo $customer['tickets']; ?></td>
+                            <td><?php echo $customer['spent']; ?> ৳</td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-
-            <div class="right-section">
-                <div class="stat-card red-card">
-                    <span>Total Booked Tickets</span>
-                    <span class="stat-number" id="total-booked-count">0</span>
-                </div>
-
-                <div class="stat-card teal-card">
-                    <span>Total Revenue</span>
-                    <span class="stat-number" id="total-revenue">0 BDT</span>
-                </div>
-
-                <div class="logout-box">
-                    <div style="font-weight: bold; margin-bottom: 5px;">Logout</div>
-                    <button class="logout-btn">Logout</button>
-                </div>
-            </div>
-
         </div>
     </div>
-
-    <script>
-        
-    </script>
 
 </body>
 </html>
