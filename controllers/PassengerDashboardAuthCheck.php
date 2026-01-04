@@ -12,8 +12,8 @@ function verifyRememberCookie()
     if (count($parts) != 3) return false;
 
     $username = $parts[0];
-    $expire   = $parts[1];
-    $sig      = $parts[2];
+    $expire = $parts[1];
+    $sig = $parts[2];
 
     if (time() > (int)$expire) return false;
 
@@ -33,6 +33,12 @@ $usernameFromCookie = verifyRememberCookie();
 
 if ($usernameFromCookie !== false) {
     $_SESSION["username"] = $usernameFromCookie;
+    $_SESSION["role"] = ($usernameFromCookie === "admin") ? "admin" : "passenger";
+
+    if ($_SESSION["role"] === "admin") {
+        header("Location: ../views/AdminDashboard.php");
+        exit();
+    }
     return;
 }
 
