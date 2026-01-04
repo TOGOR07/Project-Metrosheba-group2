@@ -58,36 +58,36 @@ require_once("../controllers/EditProfileDetailsValidation.php");
 
     <?php if(isset($errors['db'])) echo "<div class='db-error'>".$errors['db']."</div>"; ?>
 
-    <form method="POST" action="">
+    <form method="POST" action="" onsubmit="return validateEditProfile()">
 
         <div class="form-group">
             <label>Name</label>
-            <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>">
-            <?php if(isset($errors['name'])) echo "<span class='error-msg'>".$errors['name']."</span>"; ?>
+            <input id="name" type="text" name="name" value="<?php echo htmlspecialchars($name); ?>">
+            <span class="error-msg" id="err_name"><?php if(isset($errors['name'])) echo $errors['name']; ?></span>
         </div>
 
         <div class="form-group">
             <label>Email</label>
-            <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
-            <?php if(isset($errors['email'])) echo "<span class='error-msg'>".$errors['email']."</span>"; ?>
+            <input id="email" type="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
+            <span class="error-msg" id="err_email"><?php if(isset($errors['email'])) echo $errors['email']; ?></span>
         </div>
 
         <div class="form-group">
             <label>Mobile Number</label>
-            <input type="text" name="mobile" value="<?php echo htmlspecialchars($mobile); ?>">
-            <?php if(isset($errors['mobile'])) echo "<span class='error-msg'>".$errors['mobile']."</span>"; ?>
+            <input id="mobile" type="text" name="mobile" value="<?php echo htmlspecialchars($mobile); ?>">
+            <span class="error-msg" id="err_mobile"><?php if(isset($errors['mobile'])) echo $errors['mobile']; ?></span>
         </div>
 
         <div class="form-group">
             <label>Date Of Birth</label>
-            <input type="date" name="dob" value="<?php echo htmlspecialchars($dob); ?>">
-            <?php if(isset($errors['dob'])) echo "<span class='error-msg'>".$errors['dob']."</span>"; ?>
+            <input id="dob" type="date" name="dob" value="<?php echo htmlspecialchars($dob); ?>">
+            <span class="error-msg" id="err_dob"><?php if(isset($errors['dob'])) echo $errors['dob']; ?></span>
         </div>
 
         <div class="form-group">
             <label>NID Number</label>
-            <input type="text" name="nid" value="<?php echo htmlspecialchars($nid); ?>">
-            <?php if(isset($errors['nid'])) echo "<span class='error-msg'>".$errors['nid']."</span>"; ?>
+            <input id="nid" type="text" name="nid" value="<?php echo htmlspecialchars($nid); ?>">
+            <span class="error-msg" id="err_nid"><?php if(isset($errors['nid'])) echo $errors['nid']; ?></span>
         </div>
 
         <div class="form-group">
@@ -103,19 +103,87 @@ require_once("../controllers/EditProfileDetailsValidation.php");
                     <input type="radio" name="gender" value="Other" <?php if($gender=="Other") echo "checked"; ?>> Other
                 </label>
             </div>
-            <?php if(isset($errors['gender'])) echo "<span class='error-msg'>".$errors['gender']."</span>"; ?>
+            <span class="error-msg" id="err_gender"><?php if(isset($errors['gender'])) echo $errors['gender']; ?></span>
         </div>
 
         <div class="form-group">
             <label>New Password (optional)</label>
-            <input type="password" name="password" placeholder="Leave empty if you don't want to change">
-            <?php if(isset($errors['password'])) echo "<span class='error-msg'>".$errors['password']."</span>"; ?>
+            <input id="password" type="password" name="password" placeholder="Leave empty if you don't want to change">
+            <span class="error-msg" id="err_password"><?php if(isset($errors['password'])) echo $errors['password']; ?></span>
         </div>
 
         <button type="submit" class="save-btn">Save changes</button>
     </form>
 
 </div>
+
+<script>
+    function validateEditProfile() {
+        let isValid = true;
+        
+        // Reset JS Errors
+        document.querySelectorAll('.error-msg').forEach(e => {
+            // Only clear if it's NOT a PHP error (simple check)
+            // But usually we clear everything to show fresh JS errors
+            e.innerHTML = ""; 
+        });
+
+        let name = document.getElementById("name").value.trim();
+        let email = document.getElementById("email").value.trim();
+        let mobile = document.getElementById("mobile").value.trim();
+        let dob = document.getElementById("dob").value;
+        let nid = document.getElementById("nid").value.trim();
+        let password = document.getElementById("password").value;
+
+        // Name
+        if (name === "") {
+            document.getElementById("err_name").innerHTML = "Name is required";
+            isValid = false;
+        }
+
+        // Email
+        let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email === "") {
+            document.getElementById("err_email").innerHTML = "Email is required";
+            isValid = false;
+        } else if (!emailPattern.test(email)) {
+            document.getElementById("err_email").innerHTML = "Invalid email format";
+            isValid = false;
+        }
+
+        // Mobile
+        if (mobile === "") {
+            document.getElementById("err_mobile").innerHTML = "Mobile number is required";
+            isValid = false;
+        } else if (mobile.length !== 11 || !mobile.startsWith("01") || isNaN(mobile)) {
+            document.getElementById("err_mobile").innerHTML = "Mobile must be 11 digits and start with 01";
+            isValid = false;
+        }
+
+        // DOB
+        if (dob === "") {
+            document.getElementById("err_dob").innerHTML = "Date of Birth is required";
+            isValid = false;
+        }
+
+        // NID
+        if (nid === "") {
+            document.getElementById("err_nid").innerHTML = "NID is required";
+            isValid = false;
+        } else if (isNaN(nid)) {
+            document.getElementById("err_nid").innerHTML = "NID must be numeric";
+            isValid = false;
+        }
+
+        // Password (Optional check)
+        if (password !== "" && password.length < 8) {
+            document.getElementById("err_password").innerHTML = "New password must be at least 8 characters";
+            isValid = false;
+        }
+
+        return isValid;
+    }
+</script>
 
 </body>
 </html>

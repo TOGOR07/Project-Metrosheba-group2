@@ -25,13 +25,50 @@ require_once("../controllers/EditProfilePictureValidation.php");
         <div class="title">Change Profile Photo</div>
 
         <?php if (!empty($error)) echo "<span class='error-msg'>$error</span>"; ?>
+        
+        <span class="error-msg" id="js-error"></span>
 
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="profile_pic" class="file-input" accept="image/*">
+        <form method="POST" enctype="multipart/form-data" onsubmit="return validateFile()">
+            <input type="file" name="profile_pic" id="profile_pic" class="file-input" accept="image/*">
             <button type="submit" class="upload-btn">Upload Photo</button>
         </form>
 
         <a href="PassengerProfile.php" class="back-link">Cancel and Go Back</a>
     </div>
+
+<script>
+    function validateFile() {
+        let fileInput = document.getElementById("profile_pic");
+        let errorSpan = document.getElementById("js-error");
+        
+        errorSpan.innerHTML = ""; // Clear errors
+
+        if (fileInput.files.length === 0) {
+            errorSpan.innerHTML = "Please select an image to upload.";
+            return false;
+        }
+
+        let file = fileInput.files[0];
+        let fileName = file.name;
+        let fileSize = file.size;
+
+        // Extension Check
+        let allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+        if (!allowedExtensions.exec(fileName)) {
+            errorSpan.innerHTML = "Invalid file type! Only JPG, JPEG, PNG and GIF allowed.";
+            fileInput.value = ''; // Clear input
+            return false;
+        }
+
+        // Size Check (2MB = 2097152 bytes)
+        if (fileSize > 2097152) {
+            errorSpan.innerHTML = "File size must be less than 2MB.";
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
 </body>
 </html>
