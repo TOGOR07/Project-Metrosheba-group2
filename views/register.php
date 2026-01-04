@@ -227,19 +227,19 @@ require_once("../controllers/registrationvalidation.php");
           <div class="error-box"><?php echo $errors["db"]; ?></div>
         <?php } ?>
 
-        <form method="post" autocomplete="off" novalidate>
+        <form method="post" autocomplete="off" novalidate onsubmit="return validateRegistration()">
           <input type="hidden" name="action" value="register">
 
           <div class="row">
             <label>Name</label>
-            <input name="name" type="text" value="<?php echo $_POST['name'] ?? ''; ?>" placeholder="Example: Abdul Rahman">
-            <div class="field-error"><?php echo $errors["name"] ?? ""; ?></div>
+            <input id="name" name="name" type="text" value="<?php echo $_POST['name'] ?? ''; ?>" placeholder="Example: Abdul Rahman">
+            <div class="field-error" id="err_name"><?php echo $errors["name"] ?? ""; ?></div>
           </div>
 
           <div class="row">
             <label>Email</label>
-            <input name="email" type="email" value="<?php echo $_POST['email'] ?? ''; ?>" placeholder="example@gmail.com">
-            <div class="field-error"><?php echo $errors["email"] ?? ""; ?></div>
+            <input id="email" name="email" type="email" value="<?php echo $_POST['email'] ?? ''; ?>" placeholder="example@gmail.com">
+            <div class="field-error" id="err_email"><?php echo $errors["email"] ?? ""; ?></div>
           </div>
 
           <div class="row">
@@ -250,31 +250,31 @@ require_once("../controllers/registrationvalidation.php");
 
           <div class="row">
             <label>Date of Birth</label>
-            <input name="dob" type="date" value="<?php echo $_POST['dob'] ?? ''; ?>">
-            <div class="field-error"><?php echo $errors["dob"] ?? ""; ?></div>
+            <input id="dob" name="dob" type="date" value="<?php echo $_POST['dob'] ?? ''; ?>">
+            <div class="field-error" id="err_dob"><?php echo $errors["dob"] ?? ""; ?></div>
           </div>
 
           <div class="row">
             <label>NID No</label>
-            <input name="nid" type="text" value="<?php echo $_POST['nid'] ?? ''; ?>" placeholder="NID Number">
-            <div class="field-error"><?php echo $errors["nid"] ?? ""; ?></div>
+            <input id="nid" name="nid" type="text" value="<?php echo $_POST['nid'] ?? ''; ?>" placeholder="NID Number">
+            <div class="field-error" id="err_nid"><?php echo $errors["nid"] ?? ""; ?></div>
           </div>
 
           <div class="row">
             <label>Gender</label>
-            <select name="gender">
+            <select id="gender" name="gender">
               <option value="">Select</option>
               <option value="Male" <?php if(($_POST['gender'] ?? "")=="Male") echo "selected"; ?>>Male</option>
               <option value="Female" <?php if(($_POST['gender'] ?? "")=="Female") echo "selected"; ?>>Female</option>
               <option value="Other" <?php if(($_POST['gender'] ?? "")=="Other") echo "selected"; ?>>Other</option>
             </select>
-            <div class="field-error"><?php echo $errors["gender"] ?? ""; ?></div>
+            <div class="field-error" id="err_gender"><?php echo $errors["gender"] ?? ""; ?></div>
           </div>
 
           <div class="row">
             <label>Password</label>
-            <input name="password" type="password" placeholder="Enter password">
-            <div class="field-error"><?php echo $errors["password"] ?? ""; ?></div>
+            <input id="password" name="password" type="password" placeholder="Enter password">
+            <div class="field-error" id="err_password"><?php echo $errors["password"] ?? ""; ?></div>
           </div>
 
           <div class="row">
@@ -300,6 +300,7 @@ require_once("../controllers/registrationvalidation.php");
   </div>
 
 <script>
+  // OTP Sending Logic
   const btnSendOtp = document.getElementById("btnSendOtp");
   const mobileInput = document.getElementById("mobile");
   const otpMsg = document.getElementById("otpMsg");
@@ -314,6 +315,11 @@ require_once("../controllers/registrationvalidation.php");
     if(mobile === ""){
       errOtp.innerHTML = "Mobile number is required to send OTP.";
       return;
+    }
+    // Simple JS check for mobile before sending OTP
+    if(mobile.length !== 11 || !mobile.startsWith("01") || isNaN(mobile)) {
+       errOtp.innerHTML = "Valid 11 digit mobile number required.";
+       return;
     }
 
     btnSendOtp.disabled = true;
@@ -344,6 +350,90 @@ require_once("../controllers/registrationvalidation.php");
       btnSendOtp.innerHTML = "Send OTP";
     });
   };
+
+  // FORM VALIDATION LOGIC
+  function validateRegistration() {
+      let isValid = true;
+
+      // Reset Errors
+      document.querySelectorAll('.field-error').forEach(e => e.innerHTML = "");
+
+      // Values
+      let name = document.getElementById('name').value.trim();
+      let email = document.getElementById('email').value.trim();
+      let mobile = document.getElementById('mobile').value.trim();
+      let dob = document.getElementById('dob').value;
+      let nid = document.getElementById('nid').value.trim();
+      let gender = document.getElementById('gender').value;
+      let password = document.getElementById('password').value;
+      let otp = document.getElementById('otp').value.trim();
+
+      // Name Check
+      if (name === "") {
+          document.getElementById('err_name').innerHTML = "Name is required.";
+          isValid = false;
+      }
+
+      // Email Check
+      let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email === "") {
+          document.getElementById('err_email').innerHTML = "Email is required.";
+          isValid = false;
+      } else if (!emailPattern.test(email)) {
+          document.getElementById('err_email').innerHTML = "Invalid email format.";
+          isValid = false;
+      }
+
+      // Mobile Check
+      if (mobile === "") {
+          document.getElementById('err_mobile').innerHTML = "Mobile number is required.";
+          isValid = false;
+      } else if (mobile.length !== 11 || !mobile.startsWith("01") || isNaN(mobile)) {
+          document.getElementById('err_mobile').innerHTML = "Mobile must be 11 digits and start with 01.";
+          isValid = false;
+      }
+
+      // DOB Check
+      if (dob === "") {
+          document.getElementById('err_dob').innerHTML = "Date of Birth is required.";
+          isValid = false;
+      }
+
+      // NID Check
+      if (nid === "") {
+          document.getElementById('err_nid').innerHTML = "NID is required.";
+          isValid = false;
+      } else if (isNaN(nid)) {
+          document.getElementById('err_nid').innerHTML = "NID must be numeric.";
+          isValid = false;
+      }
+
+      // Gender Check
+      if (gender === "") {
+          document.getElementById('err_gender').innerHTML = "Gender is required.";
+          isValid = false;
+      }
+
+      // Password Check
+      if (password === "") {
+          document.getElementById('err_password').innerHTML = "Password is required.";
+          isValid = false;
+      } else if (password.length < 8) {
+          document.getElementById('err_password').innerHTML = "Password must be at least 8 characters.";
+          isValid = false;
+      }
+
+      // OTP Check
+      if (otp === "") {
+          document.getElementById('err_otp').innerHTML = "OTP is required.";
+          isValid = false;
+      } else if (otp.length !== 6 || isNaN(otp)) {
+          document.getElementById('err_otp').innerHTML = "OTP must be 6 digits.";
+          isValid = false;
+      }
+
+      return isValid;
+  }
 </script>
 
 </body>

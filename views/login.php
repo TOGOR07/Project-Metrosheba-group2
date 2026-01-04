@@ -30,6 +30,21 @@ require_once("../controllers/loginvalidation.php");
       top: 0;
       left: 0;
       z-index: 1000;
+      display: none; /* JS will show this */
+    }
+
+    .php-error-banner {
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        font-weight: bold;
+        color: red;
+        background: #ffffff;
+        border-bottom: 1px solid #ddd;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
     }
 
     .page {
@@ -136,11 +151,13 @@ require_once("../controllers/loginvalidation.php");
 
 <body>
 
+<div id="js-error-banner" class="error-banner"></div>
+
 <?php if (!empty($error)) { ?>
-  <div class="error-banner"><?php echo $error; ?></div>
+  <div class="php-error-banner"><?php echo $error; ?></div>
 <?php } ?>
 
-<div class="page">
+<div class="page" id="mainPage">
   <div class="left"></div>
 
   <div class="right">
@@ -148,17 +165,17 @@ require_once("../controllers/loginvalidation.php");
       <h1>Login</h1>
       <div class="line"></div>
 
-      <form method="POST" action="">
+      <form method="POST" action="" onsubmit="return validateLogin()">
         <input type="hidden" name="action" value="login">
 
         <div class="row">
           <label>Username</label>
-          <input name="username" type="text" placeholder="Enter username" autocomplete="off">
+          <input id="username" name="username" type="text" placeholder="Enter username" autocomplete="off">
         </div>
 
         <div class="row">
           <label>Password</label>
-          <input name="password" type="password" placeholder="Enter password" autocomplete="new-password">
+          <input id="password" name="password" type="password" placeholder="Enter password" autocomplete="new-password">
         </div>
 
         <button class="btn" type="submit">Login</button>
@@ -172,6 +189,26 @@ require_once("../controllers/loginvalidation.php");
     </div>
   </div>
 </div>
+
+<script>
+    function validateLogin() {
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value;
+        let banner = document.getElementById("js-error-banner");
+        let page = document.getElementById("mainPage");
+
+        if (username === "" || password === "") {
+            banner.innerHTML = "Username and Password are required!";
+            banner.style.display = "block";
+            page.style.paddingTop = "50px";
+            return false;
+        }
+
+        banner.style.display = "none";
+        page.style.paddingTop = "0";
+        return true;
+    }
+</script>
 
 </body>
 </html>

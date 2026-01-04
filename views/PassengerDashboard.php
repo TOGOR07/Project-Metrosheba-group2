@@ -122,7 +122,7 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="">
+                <form method="POST" action="" onsubmit="return validateTicket()">
                     <div class="form-row">
                         <div class="form-group">
                             <label>From Station</label>
@@ -225,6 +225,30 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
             let total = farePerTicket * quantity;
             document.getElementById('perPrice').value = farePerTicket + " BDT";
             document.getElementById('totalPrice').value = total + " BDT";
+        }
+
+        // JS Validation
+        function validateTicket() {
+            let fromStation = document.getElementById("fromStation").value;
+            let toStation = document.getElementById("toStation").value;
+            let quantity = document.getElementById("quantity").value;
+
+            if (fromStation === "" || toStation === "") {
+                alert("Please select both From and To stations.");
+                return false;
+            }
+
+            if (fromStation === toStation) {
+                alert("Departure and Destination stations cannot be the same!");
+                return false;
+            }
+
+            if (quantity < 1 || quantity > 10) {
+                alert("You can only purchase between 1 and 10 tickets.");
+                return false;
+            }
+
+            return true;
         }
 
         calculatePrice();
