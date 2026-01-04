@@ -1,7 +1,3 @@
-<?php
-require_once("../controllers/ticketinfocontroller.php");
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,7 +40,6 @@ require_once("../controllers/ticketinfocontroller.php");
 
         .admin-info { display: flex; align-items: center; gap: 10px; }
         .admin-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent-color); }
-
     </style>
 </head>
 <body>
@@ -75,11 +70,11 @@ require_once("../controllers/ticketinfocontroller.php");
 
         <div class="stats-container">
             <div class="card">
-                <h3><?php echo $stats["total_customers"]; ?></h3>
+                <h3 id="totalCustomers">0</h3>
                 <p>Total Customers</p>
             </div>
             <div class="card">
-                <h3><?php echo $stats["total_tickets"]; ?></h3>
+                <h3 id="totalTickets">0</h3>
                 <p>Total Sold Tickets</p>
             </div>
         </div>
@@ -103,25 +98,47 @@ require_once("../controllers/ticketinfocontroller.php");
                             <th>Purchase Date</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php foreach ($tickets as $t): ?>
-                        <tr>
-                            <td>#<?php echo $t["id"]; ?></td>
-                            <td><?php echo $t["username"]; ?></td>
-                            <td><?php echo $t["from_station"]; ?></td>
-                            <td><?php echo $t["to_station"]; ?></td>
-                            <td><?php echo $t["quantity"]; ?></td>
-                            <td><?php echo $t["per_price"]; ?> ৳</td>
-                            <td><?php echo $t["total_price"]; ?> ৳</td>
-                            <td><?php echo $t["purchase_date"]; ?></td>
-                        </tr>
-                        <?php endforeach; ?>
+                    <tbody id="ticketTableBody">
                     </tbody>
                 </table>
 
             </div>
         </div>
     </div>
+
+
+<script>
+fetch("../controllers/ticketinfo_api.php")
+.then(res => res.json())
+.then(data => {
+
+    document.getElementById("totalCustomers").innerText = data.stats.total_customers;
+    document.getElementById("totalTickets").innerText = data.stats.total_tickets;
+
+
+    let tbody = document.getElementById("ticketTableBody");
+    tbody.innerHTML = "";
+
+    data.tickets.forEach(t => {
+        tbody.innerHTML += `
+        <tr>
+            <td>#${t.id}</td>
+            <td>${t.username}</td>
+            <td>${t.from_station}</td>
+            <td>${t.to_station}</td>
+            <td>${t.quantity}</td>
+            <td>${t.per_price} ৳</td>
+            <td>${t.total_price} ৳</td>
+            <td>${t.purchase_date}</td>
+        </tr>
+        `;
+    });
+
+})
+.catch(err => {
+    console.log("JSON Load Error:", err);
+});
+</script>
 
 </body>
 </html>

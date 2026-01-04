@@ -226,8 +226,6 @@ require_once("../controllers/PassengerDashboardStationCheck.php");
             document.getElementById('perPrice').value = farePerTicket + " BDT";
             document.getElementById('totalPrice').value = total + " BDT";
         }
-
-        // JS Validation
         function validateTicket() {
             let fromStation = document.getElementById("fromStation").value;
             let toStation = document.getElementById("toStation").value;

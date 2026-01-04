@@ -121,10 +121,7 @@ require_once("../controllers/EditProfileDetailsValidation.php");
     function validateEditProfile() {
         let isValid = true;
         
-        // Reset JS Errors
         document.querySelectorAll('.error-msg').forEach(e => {
-            // Only clear if it's NOT a PHP error (simple check)
-            // But usually we clear everything to show fresh JS errors
             e.innerHTML = ""; 
         });
 
@@ -135,23 +132,23 @@ require_once("../controllers/EditProfileDetailsValidation.php");
         let nid = document.getElementById("nid").value.trim();
         let password = document.getElementById("password").value;
 
-        // Name
         if (name === "") {
             document.getElementById("err_name").innerHTML = "Name is required";
             isValid = false;
         }
 
-        // Email
-        let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (email === "") {
             document.getElementById("err_email").innerHTML = "Email is required";
             isValid = false;
-        } else if (!emailPattern.test(email)) {
-            document.getElementById("err_email").innerHTML = "Invalid email format";
-            isValid = false;
+        } else {
+            let atPos = email.indexOf("@");
+            let dotPos = email.lastIndexOf(".");
+            if (atPos < 1 || dotPos < atPos + 2 || dotPos + 2 >= email.length) {
+                document.getElementById("err_email").innerHTML = "Invalid email format";
+                isValid = false;
+            }
         }
 
-        // Mobile
         if (mobile === "") {
             document.getElementById("err_mobile").innerHTML = "Mobile number is required";
             isValid = false;
@@ -160,13 +157,11 @@ require_once("../controllers/EditProfileDetailsValidation.php");
             isValid = false;
         }
 
-        // DOB
         if (dob === "") {
             document.getElementById("err_dob").innerHTML = "Date of Birth is required";
             isValid = false;
         }
 
-        // NID
         if (nid === "") {
             document.getElementById("err_nid").innerHTML = "NID is required";
             isValid = false;
@@ -175,7 +170,6 @@ require_once("../controllers/EditProfileDetailsValidation.php");
             isValid = false;
         }
 
-        // Password (Optional check)
         if (password !== "" && password.length < 8) {
             document.getElementById("err_password").innerHTML = "New password must be at least 8 characters";
             isValid = false;

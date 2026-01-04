@@ -300,7 +300,6 @@ require_once("../controllers/registrationvalidation.php");
   </div>
 
 <script>
-  // OTP Sending Logic
   const btnSendOtp = document.getElementById("btnSendOtp");
   const mobileInput = document.getElementById("mobile");
   const otpMsg = document.getElementById("otpMsg");
@@ -316,7 +315,6 @@ require_once("../controllers/registrationvalidation.php");
       errOtp.innerHTML = "Mobile number is required to send OTP.";
       return;
     }
-    // Simple JS check for mobile before sending OTP
     if(mobile.length !== 11 || !mobile.startsWith("01") || isNaN(mobile)) {
        errOtp.innerHTML = "Valid 11 digit mobile number required.";
        return;
@@ -351,14 +349,11 @@ require_once("../controllers/registrationvalidation.php");
     });
   };
 
-  // FORM VALIDATION LOGIC
   function validateRegistration() {
       let isValid = true;
 
-      // Reset Errors
       document.querySelectorAll('.field-error').forEach(e => e.innerHTML = "");
 
-      // Values
       let name = document.getElementById('name').value.trim();
       let email = document.getElementById('email').value.trim();
       let mobile = document.getElementById('mobile').value.trim();
@@ -368,13 +363,11 @@ require_once("../controllers/registrationvalidation.php");
       let password = document.getElementById('password').value;
       let otp = document.getElementById('otp').value.trim();
 
-      // Name Check
       if (name === "") {
           document.getElementById('err_name').innerHTML = "Name is required.";
           isValid = false;
       }
 
-      // Email Check
       let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (email === "") {
           document.getElementById('err_email').innerHTML = "Email is required.";
@@ -384,7 +377,6 @@ require_once("../controllers/registrationvalidation.php");
           isValid = false;
       }
 
-      // Mobile Check
       if (mobile === "") {
           document.getElementById('err_mobile').innerHTML = "Mobile number is required.";
           isValid = false;
@@ -393,13 +385,11 @@ require_once("../controllers/registrationvalidation.php");
           isValid = false;
       }
 
-      // DOB Check
       if (dob === "") {
           document.getElementById('err_dob').innerHTML = "Date of Birth is required.";
           isValid = false;
       }
 
-      // NID Check
       if (nid === "") {
           document.getElementById('err_nid').innerHTML = "NID is required.";
           isValid = false;
@@ -408,13 +398,11 @@ require_once("../controllers/registrationvalidation.php");
           isValid = false;
       }
 
-      // Gender Check
       if (gender === "") {
           document.getElementById('err_gender').innerHTML = "Gender is required.";
           isValid = false;
       }
 
-      // Password Check
       if (password === "") {
           document.getElementById('err_password').innerHTML = "Password is required.";
           isValid = false;
@@ -423,7 +411,6 @@ require_once("../controllers/registrationvalidation.php");
           isValid = false;
       }
 
-      // OTP Check
       if (otp === "") {
           document.getElementById('err_otp').innerHTML = "OTP is required.";
           isValid = false;
