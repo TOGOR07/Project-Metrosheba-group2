@@ -18,18 +18,22 @@ require_once("../controllers/registrationvalidation.php");
       padding: 0;
       font-family: 'Poppins', Arial, sans-serif;
       background: #f2f2f2;
+<<<<<<< Updated upstream
       overflow: auto; 
+=======
+      overflow: hidden;
+>>>>>>> Stashed changes
     }
 
     .page {
       width: 100%;
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
     }
 
     .left {
-      width: 60%;
-      min-height: 100vh;
+      width: 55%;
+      height: 100vh;
       background-image: url("../assets/metro5.webp");
       background-size: cover;
       background-position: center;
@@ -39,8 +43,8 @@ require_once("../controllers/registrationvalidation.php");
     }
 
     .right {
-      width: 40%;
-      min-height: 100vh;
+      width: 45%;
+      height: 100vh;
       background: #ffffff;
       display: flex;
       justify-content: center;
