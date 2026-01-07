@@ -37,6 +37,6 @@ if ($usernameFromCookie === "admin") {
     return;
 }
 
-header("Location: ../views/Login.php");
+header("Location: ../views/login.php");
 exit();
 ?>

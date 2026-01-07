@@ -42,6 +42,6 @@ if ($usernameFromCookie !== false) {
     return;
 }
 
-header("Location: ../views/Login.php");
+header("Location: ../views/login.php");
 exit();
 ?>
