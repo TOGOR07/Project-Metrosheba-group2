@@ -15,19 +15,32 @@ function createRememberCookie($username)
     setcookie("remember_me", $cookieValue, $expire, "/");
 }
 
+function clearRememberCookie()
+{
+    if (isset($_COOKIE["remember_me"])) {
+        setcookie("remember_me", "", time() - 3600, "/");
+    }
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === "login") {
 
-    $username = trim($_POST["username"]);
-    $password = trim($_POST["password"]);
+    $username = trim($_POST["username"] ?? "");
+    $password = trim($_POST["password"] ?? "");
 
-    if ($username == "" || $password == "") {
+    if ($username === "" || $password === "") {
         $error = "Username and Password required!";
     } else {
 
         if ($username === "admin" && $password === "admin") {
             $_SESSION["username"] = "admin";
             $_SESSION["role"] = "admin";
-            createRememberCookie("admin");
+
+            if (isset($_POST["remember"])) {
+                createRememberCookie("admin");
+            } else {
+                clearRememberCookie();
+            }
+
             header("Location: ../views/AdminDashboard.php");
             exit();
         }
@@ -45,7 +58,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
                 if (password_verify($password, $user["password"])) {
                     $_SESSION["username"] = $user["name"];
                     $_SESSION["role"] = "passenger";
-                    createRememberCookie($user["name"]);
+
+                    if (isset($_POST["remember"])) {
+                        createRememberCookie($user["name"]);
+                    } else {
+                        clearRememberCookie();
+                    }
+
                     header("Location: ../views/PassengerDashboard.php");
                     exit();
                 } else {
