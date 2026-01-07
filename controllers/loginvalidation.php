@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
 
         // Admin (hard-coded)
         // If you want admin password admin1, change it here.
-        if ($email === "admin" && $password === "admin") {
+        if ($email === "admin@gmail.com" && $password === "admin") {
             $_SESSION["username"] = "admin";
             $_SESSION["role"] = "admin";
 
