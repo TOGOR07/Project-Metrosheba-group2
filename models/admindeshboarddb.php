@@ -40,4 +40,40 @@ function getTicketStats()
 
     return $stats;
 }
+
+function getUserById($id)
+{
+    global $conn;
+    $id = intval($id);
+    $sql = "SELECT id, name, email, mobile_number, nid, gender FROM users WHERE id=$id LIMIT 1";
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        return mysqli_fetch_assoc($result);
+    }
+    return null;
+}
+
+function updateUser($id, $name, $email, $mobile, $nid, $gender)
+{
+    global $conn;
+    $id = intval($id);
+
+    $sql = "UPDATE users SET 
+            name='$name', 
+            email='$email', 
+            mobile_number='$mobile',
+            nid='$nid',
+            gender='$gender'
+            WHERE id=$id";
+
+    return mysqli_query($conn, $sql);
+}
+
+function deleteUser($id)
+{
+    global $conn;
+    $id = intval($id);
+    $sql = "DELETE FROM users WHERE id=$id";
+    return mysqli_query($conn, $sql);
+}
 ?>

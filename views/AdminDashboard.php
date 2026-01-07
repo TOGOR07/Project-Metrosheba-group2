@@ -48,6 +48,14 @@ require_once("../controllers/AdminDashboardController.php");
         .admin-info { display: flex; align-items: center; gap: 10px; }
         .admin-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent-color); }
 
+        .form-input {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
     </style>
 </head>
 <body>
@@ -88,6 +96,40 @@ require_once("../controllers/AdminDashboardController.php");
         </div>
 
         <div class="table-container">
+
+            <?php
+            $editUser = null;
+            if(isset($_GET['edit_id'])){
+                $editId = $_GET['edit_id'];
+                $editUser = getUserById($editId);
+            }
+            ?>
+            
+            <?php if($editUser): ?>
+            <div class="table-card" style="margin-bottom:20px;">
+                <h3 style="margin-bottom:15px;">Update User</h3>
+
+                <form method="POST" action="../controllers/AdminDashboardController.php">
+                    <input type="hidden" name="id" value="<?php echo $editUser['id']; ?>">
+
+                    <input class="form-input" type="text" name="name" value="<?php echo $editUser['name']; ?>" placeholder="Name" required>
+                    <input class="form-input" type="email" name="email" value="<?php echo $editUser['email']; ?>" placeholder="Email" required>
+                    <input class="form-input" type="text" name="mobile_number" value="<?php echo $editUser['mobile_number']; ?>" placeholder="Mobile" required>
+                    <input class="form-input" type="text" name="nid" value="<?php echo $editUser['nid']; ?>" placeholder="NID" required>
+
+                    <select class="form-input" name="gender" required>
+                        <option value="Male" <?php if($editUser['gender']=="Male") echo "selected"; ?>>Male</option>
+                        <option value="Female" <?php if($editUser['gender']=="Female") echo "selected"; ?>>Female</option>
+                        <option value="Other" <?php if($editUser['gender']=="Other") echo "selected"; ?>>Other</option>
+                    </select>
+
+                    <button type="submit" name="update_user" class="btn-export">Update</button>
+                    <a href="AdminDashboard.php" class="btn-export" style="background:#555;">Cancel</a>
+                </form>
+            </div>
+            <?php endif; ?>
+
+
             <div class="table-card">
                 <div class="table-header">
                     <h3>Customer Information</h3>
@@ -102,6 +144,7 @@ require_once("../controllers/AdminDashboardController.php");
                             <th>Mobile</th>
                             <th>NID</th>
                             <th>Gender</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,6 +156,15 @@ require_once("../controllers/AdminDashboardController.php");
                             <td><?php echo $c['mobile_number']; ?></td>
                             <td><?php echo $c['nid']; ?></td>
                             <td><?php echo $c['gender']; ?></td>
+                            <td>
+                                <a href="AdminDashboard.php?edit_id=<?php echo $c['id']; ?>" class="btn-export">Edit</a>
+
+                                <a href="../controllers/AdminDashboardController.php?delete_id=<?php echo $c['id']; ?>" 
+                                   class="btn-export"
+                                   onclick="return confirm('Are you sure you want to delete this user?');">
+                                   Delete
+                                </a>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
