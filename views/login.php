@@ -1,22 +1,22 @@
 <?php
 require_once("../controllers/loginvalidation.php");
 
-$cookieUsername = "";
+$cookieEmail = "";
 $rememberChecked = false;
 
 if (isset($_COOKIE["remember_me"])) {
     $parts = explode("|", $_COOKIE["remember_me"]);
     if (count($parts) == 3) {
-        $cookieUsername = $parts[0];
-        if ($cookieUsername !== "") {
+        $cookieEmail = $parts[0];
+        if ($cookieEmail !== "") {
             $rememberChecked = true;
         }
     }
 }
 
-$showUsername = $cookieUsername;
-if (isset($_POST["username"])) {
-    $showUsername = trim($_POST["username"]);
+$showEmail = $cookieEmail;
+if (isset($_POST["email"])) {
+    $showEmail = trim($_POST["email"]);
 }
 ?>
 
@@ -34,21 +34,7 @@ if (isset($_POST["username"])) {
       padding: 0;
       font-family: Arial, sans-serif;
       background: #f2f2f2;
-    }
-
-    .error-banner {
-      width: 100%;
-      padding: 12px;
-      text-align: center;
-      font-weight: bold;
-      color: red;
-      background: #ffffff;
-      border-bottom: 1px solid #ddd;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      display: none;
+      overflow: hidden;
     }
 
     .php-error-banner {
@@ -131,6 +117,13 @@ if (isset($_POST["username"])) {
       box-sizing: border-box;
     }
 
+    .field-error {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #a10000;
+      min-height: 14px;
+    }
+
     .btn {
       border: none;
       padding: 12px;
@@ -168,13 +161,11 @@ if (isset($_POST["username"])) {
 
 <body>
 
-<div id="js-error-banner" class="error-banner"></div>
-
 <?php if (!empty($error)) { ?>
   <div class="php-error-banner"><?php echo $error; ?></div>
 <?php } ?>
 
-<div class="page" id="mainPage">
+<div class="page">
   <div class="left"></div>
 
   <div class="right">
@@ -186,14 +177,20 @@ if (isset($_POST["username"])) {
         <input type="hidden" name="action" value="login">
 
         <div class="row">
-          <label>Username</label>
-          <input id="username" name="username" type="text" placeholder="Enter username"
-                 value="<?php echo htmlspecialchars($showUsername); ?>" autocomplete="off">
+          <label>Email</label>
+          <input id="email" name="email" type="text" placeholder="Enter email"
+                 value="<?php echo htmlspecialchars($showEmail); ?>"
+                 autocomplete="off"
+                 onblur="checkEmail()" oninput="checkEmail()">
+          <div class="field-error" id="err_email"></div>
         </div>
 
         <div class="row">
           <label>Password</label>
-          <input id="password" name="password" type="password" placeholder="Enter password" autocomplete="new-password">
+          <input id="password" name="password" type="password" placeholder="Enter password"
+                 autocomplete="new-password"
+                 onblur="checkPassword()" oninput="checkPassword()">
+          <div class="field-error" id="err_password"></div>
         </div>
 
         <div class="row" style="display:flex; gap:8px; align-items:center;">
@@ -205,7 +202,7 @@ if (isset($_POST["username"])) {
 
         <div class="small">
           Don't have an account?
-          <a href="Register.php">Register</a>
+          <a href="register.php">Register</a>
         </div>
       </form>
 
@@ -214,23 +211,70 @@ if (isset($_POST["username"])) {
 </div>
 
 <script>
-  function validateLogin() {
-    let username = document.getElementById("username").value.trim();
-    let password = document.getElementById("password").value;
-    let banner = document.getElementById("js-error-banner");
-    let page = document.getElementById("mainPage");
+  function setError(id, msg) {
+    document.getElementById(id).innerHTML = msg;
+  }
 
-    if (username === "" || password === "") {
-      banner.innerHTML = "Username and Password are required!";
-      banner.style.display = "block";
-      page.style.paddingTop = "50px";
+  function clearError(id) {
+    document.getElementById(id).innerHTML = "";
+  }
+
+  function isSimpleEmailValid(email) {
+    if (email === "") return false;
+    if (email.indexOf(" ") !== -1) return false;
+
+    let atPos = email.indexOf("@");
+    let lastAt = email.lastIndexOf("@");
+
+    if (atPos <= 0) return false;
+    if (atPos !== lastAt) return false;
+
+    let dotPos = email.lastIndexOf(".");
+    if (dotPos === -1) return false;
+    if (dotPos < atPos + 2) return false;
+    if (dotPos === email.length - 1) return false;
+
+    return true;
+  }
+
+  function checkEmail() {
+    let email = document.getElementById("email").value.trim();
+
+    if (email === "") {
+      setError("err_email", "Email is required.");
       return false;
     }
 
-    banner.style.display = "none";
-    page.style.paddingTop = "0";
+    if (!isSimpleEmailValid(email)) {
+      setError("err_email", "Invalid email format.");
+      return false;
+    }
+
+    clearError("err_email");
     return true;
   }
+
+  function checkPassword() {
+    let password = document.getElementById("password").value;
+
+    if (password === "") {
+      setError("err_password", "Password is required.");
+      return false;
+    }
+
+    clearError("err_password");
+    return true;
+  }
+
+  function validateLogin() {
+    let ok = true;
+
+    if (!checkEmail()) ok = false;
+    if (!checkPassword()) ok = false;
+
+    return ok;
+  }
+  checkEmail();
 </script>
 
 </body>

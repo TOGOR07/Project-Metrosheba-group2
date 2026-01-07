@@ -6,10 +6,10 @@ require_once("../models/config.php");
 
 $error = "";
 
-function createRememberCookie($username)
+function createRememberCookie($email)
 {
     $expire = time() + (86400 * REMEMBER_DAYS);
-    $data = $username . "|" . $expire;
+    $data = $email . "|" . $expire;
     $signature = hash_hmac("sha256", $data, APP_SECRET_KEY);
     $cookieValue = $data . "|" . $signature;
     setcookie("remember_me", $cookieValue, $expire, "/");
@@ -24,14 +24,16 @@ function clearRememberCookie()
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === "login") {
 
-    $username = trim($_POST["username"] ?? "");
+    $email = trim($_POST["email"] ?? "");
     $password = trim($_POST["password"] ?? "");
 
-    if ($username === "" || $password === "") {
-        $error = "Username and Password required!";
+    if ($email === "" || $password === "") {
+        $error = "Email and Password required!";
     } else {
 
-        if ($username === "admin" && $password === "admin") {
+        // Admin (hard-coded)
+        // If you want admin password admin1, change it here.
+        if ($email === "admin" && $password === "admin") {
             $_SESSION["username"] = "admin";
             $_SESSION["role"] = "admin";
 
@@ -45,22 +47,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
             exit();
         }
 
-        $sql = "SELECT * FROM users WHERE name = ?";
+        // Passenger (login by email)
+        $sql = "SELECT * FROM users WHERE email = ?";
         $stmt = mysqli_prepare($conn, $sql);
 
         if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_bind_param($stmt, "s", $email);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
 
             if ($user = mysqli_fetch_assoc($result)) {
 
                 if (password_verify($password, $user["password"])) {
-                    $_SESSION["username"] = $user["name"];
+                    // store email in session username (dashboard will show this)
+                    $_SESSION["username"] = $user["email"];
                     $_SESSION["role"] = "passenger";
 
                     if (isset($_POST["remember"])) {
-                        createRememberCookie($user["name"]);
+                        createRememberCookie($user["email"]);
                     } else {
                         clearRememberCookie();
                     }
