@@ -1,5 +1,23 @@
 <?php
 require_once("../controllers/loginvalidation.php");
+
+$cookieUsername = "";
+$rememberChecked = false;
+
+if (isset($_COOKIE["remember_me"])) {
+    $parts = explode("|", $_COOKIE["remember_me"]);
+    if (count($parts) == 3) {
+        $cookieUsername = $parts[0];
+        if ($cookieUsername !== "") {
+            $rememberChecked = true;
+        }
+    }
+}
+
+$showUsername = $cookieUsername;
+if (isset($_POST["username"])) {
+    $showUsername = trim($_POST["username"]);
+}
 ?>
 
 <!DOCTYPE html>
@@ -30,21 +48,21 @@ require_once("../controllers/loginvalidation.php");
       top: 0;
       left: 0;
       z-index: 1000;
-      display: none; /* JS will show this */
+      display: none;
     }
 
     .php-error-banner {
-        width: 100%;
-        padding: 12px;
-        text-align: center;
-        font-weight: bold;
-        color: red;
-        background: #ffffff;
-        border-bottom: 1px solid #ddd;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      color: red;
+      background: #ffffff;
+      border-bottom: 1px solid #ddd;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
     }
 
     .page {
@@ -145,7 +163,6 @@ require_once("../controllers/loginvalidation.php");
     .small a:hover {
       text-decoration: underline;
     }
-
   </style>
 </head>
 
@@ -170,12 +187,18 @@ require_once("../controllers/loginvalidation.php");
 
         <div class="row">
           <label>Username</label>
-          <input id="username" name="username" type="text" placeholder="Enter username" autocomplete="off">
+          <input id="username" name="username" type="text" placeholder="Enter username"
+                 value="<?php echo htmlspecialchars($showUsername); ?>" autocomplete="off">
         </div>
 
         <div class="row">
           <label>Password</label>
           <input id="password" name="password" type="password" placeholder="Enter password" autocomplete="new-password">
+        </div>
+
+        <div class="row" style="display:flex; gap:8px; align-items:center;">
+          <input type="checkbox" name="remember" value="1" style="width:auto;" <?php if ($rememberChecked) echo "checked"; ?>>
+          <label style="margin:0;">Remember me</label>
         </div>
 
         <button class="btn" type="submit">Login</button>
@@ -191,23 +214,23 @@ require_once("../controllers/loginvalidation.php");
 </div>
 
 <script>
-    function validateLogin() {
-        let username = document.getElementById("username").value.trim();
-        let password = document.getElementById("password").value;
-        let banner = document.getElementById("js-error-banner");
-        let page = document.getElementById("mainPage");
+  function validateLogin() {
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value;
+    let banner = document.getElementById("js-error-banner");
+    let page = document.getElementById("mainPage");
 
-        if (username === "" || password === "") {
-            banner.innerHTML = "Username and Password are required!";
-            banner.style.display = "block";
-            page.style.paddingTop = "50px";
-            return false;
-        }
-
-        banner.style.display = "none";
-        page.style.paddingTop = "0";
-        return true;
+    if (username === "" || password === "") {
+      banner.innerHTML = "Username and Password are required!";
+      banner.style.display = "block";
+      page.style.paddingTop = "50px";
+      return false;
     }
+
+    banner.style.display = "none";
+    page.style.paddingTop = "0";
+    return true;
+  }
 </script>
 
 </body>
