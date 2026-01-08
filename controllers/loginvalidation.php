@@ -32,23 +32,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
     } else {
 
         // Admin (hard-coded)
-        // If you want admin password admin1, change it here.
+        // change password here if you use different one (admin / admin1)
         if ($email === "admin@gmail.com" && $password === "admin") {
             $_SESSION["username"] = "admin";
+            $_SESSION["email"] = "admin";
             $_SESSION["role"] = "admin";
 
-            if (isset($_POST["remember"])) {
-                createRememberCookie("admin");
-            } else {
-                clearRememberCookie();
-            }
+            if (isset($_POST["remember"])) createRememberCookie("admin");
+            else clearRememberCookie();
 
             header("Location: ../views/AdminDashboard.php");
             exit();
         }
 
-        // Passenger (login by email)
-        $sql = "SELECT * FROM users WHERE email = ?";
+        // Passenger: login by email
+        $sql = "SELECT * FROM users WHERE email = ? LIMIT 1";
         $stmt = mysqli_prepare($conn, $sql);
 
         if ($stmt) {
@@ -59,18 +57,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
             if ($user = mysqli_fetch_assoc($result)) {
 
                 if (password_verify($password, $user["password"])) {
-                    // store email in session username (dashboard will show this)
-                    $_SESSION["username"] = $user["email"];
+
+                    // IMPORTANT: store both
+                    $_SESSION["username"] = $user["name"];   // display name
+                    $_SESSION["email"] = $user["email"];     // login identity
                     $_SESSION["role"] = "passenger";
 
-                    if (isset($_POST["remember"])) {
-                        createRememberCookie($user["email"]);
-                    } else {
-                        clearRememberCookie();
-                    }
+                    if (isset($_POST["remember"])) createRememberCookie($user["email"]);
+                    else clearRememberCookie();
 
                     header("Location: ../views/PassengerDashboard.php");
                     exit();
+
                 } else {
                     $error = "Wrong password!";
                 }
