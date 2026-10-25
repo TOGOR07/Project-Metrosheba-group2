@@ -1,0 +1,227 @@
+/* Profile view and the edit-profile form. */
+
+body.profile {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f4f4;
+}
+
+.left-section {
+    flex: 1;
+    background-image: url('../342.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.left-section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.right-section {
+    flex: 1;
+    background: var(--white);
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    gap: 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.back-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+.page-title {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.profile-img-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border);
+    background: #f0f0f0;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-group .label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.info-group .value {
+    font-size: 17px;
+    font-weight: 700;
+    color: #000000;
+    padding: 5px 0;
+    border-bottom: 1px solid #eeeeee;
+    word-break: break-word;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+/* ---------- picture upload (AJAX) ---------- */
+
+.upload-box {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.upload-box input[type="file"] {
+    font-size: 12px;
+    padding: 6px;
+    width: 190px;
+}
+
+.upload-status {
+    font-size: 12px;
+    min-height: 15px;
+    text-align: center;
+}
+
+.upload-status.ok {
+    color: var(--success);
+}
+
+.upload-status.bad {
+    color: var(--danger);
+}
+
+/* ---------- edit profile form ---------- */
+
+body.edit-profile {
+    display: flex;
+    justify-content: center;
+    background: var(--white);
+    min-height: 100vh;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 520px;
+    padding: 20px 20px 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-container .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    background: none;
+    color: inherit;
+    min-height: 0;
+}
+
+.form-container .back-btn {
+    position: absolute;
+    left: 0;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.app-title {
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.title-section {
+    margin-bottom: 25px;
+}
+
+.main-title {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.sub-title {
+    font-size: 14px;
+    color: #555555;
+    margin-top: 5px;
+}
+
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="date"],
+.form-container input[type="password"] {
+    background-color: #f3ecec;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.form-container input.is-invalid {
+    border-color: var(--danger);
+    background-color: #fdf1f1;
+}
+
+.save-btn {
+    border-radius: 30px;
+    padding: 15px;
+    font-size: 17px;
+    margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+    body.profile {
+        flex-direction: column;
+    }
+
+    .left-section {
+        min-height: 180px;
+    }
+
+    .right-section {
+        padding: 25px 20px 50px;
+    }
+}

@@ -1,13 +1,14 @@
 <?php
-header("Content-Type: application/json");
-
+require_once("api_bootstrap.php");
 require_once("../models/ticketinfodb.php");
 
-$stats = getTicketInfoStats();
-$tickets = getAllTickets();
+requireLogin("admin");
 
-echo json_encode([
-    "stats" => $stats,
-    "tickets" => $tickets
+$search = trim($_GET["search"] ?? "");
+
+jsonReply(true, [
+    "stats" => getTicketInfoStats(),
+    "tickets" => getAllTickets($search),
+    "routes" => getTopRoutes(5)
 ]);
 ?>

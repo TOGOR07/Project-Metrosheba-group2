@@ -53,31 +53,8 @@ function isSimpleEmailValid($email)
     return true;
 }
 
-if (isset($_POST["ajax"]) && $_POST["ajax"] === "send_otp") {
-    header("Content-Type: application/json; charset=UTF-8");
-
-    $mobile = trim($_POST["mobile"] ?? "");
-
-    if ($mobile === "") {
-        echo json_encode(["success" => false, "message" => "Mobile number is required."]);
-        exit;
-    }
-
-    if (!ctype_digit($mobile) || strlen($mobile) !== 11 || substr($mobile, 0, 2) !== "01") {
-        echo json_encode(["success" => false, "message" => "Mobile must be 11 digits and start with 01."]);
-        exit;
-    }
-
-    $otp = (string) random_int(100000, 999999);
-
-    $_SESSION["otp_codes"][$mobile] = [
-        "otp" => $otp,
-        "time" => time()
-    ];
-
-    echo json_encode(["success" => true, "message" => "OTP sent. (Demo OTP: $otp)"]);
-    exit;
-}
+// OTP delivery lives in controllers/registration_otp_api.php so the
+// registration page itself only deals with the final submit.
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === "register") {
 
@@ -102,6 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
             } else {
                 if (strlen($words[0]) < 2 || strlen($words[1]) < 2) {
                     $errors["name"] = "Each word must be at least 2 characters.";
+                } else if (isNameExists($name)) {
+                    $errors["name"] = "This name is already registered.";
                 }
             }
         }
@@ -150,8 +129,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
     } else if (!isset($_SESSION["otp_codes"][$mobile])) {
         $errors["otp"] = "Please click 'Send OTP' first.";
     } else {
-        $savedOtp = $_SESSION["otp_codes"][$mobile]["otp"];
-        if ($otp !== $savedOtp) {
+        $saved = $_SESSION["otp_codes"][$mobile];
+
+        // A code is good for five minutes; after that a fresh one is
+        // required so an old screenshot of an OTP cannot be reused.
+        if (time() - $saved["time"] > 300) {
+            unset($_SESSION["otp_codes"][$mobile]);
+            $errors["otp"] = "This OTP has expired. Please send a new one.";
+        } else if ($otp !== $saved["otp"]) {
             $errors["otp"] = "Invalid OTP.";
         }
     }

@@ -1,0 +1,3 @@
+# Uploaded profile pictures are runtime data, not source.
+assets/uploads/*
+!assets/uploads/.gitignore

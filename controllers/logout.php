@@ -6,6 +6,6 @@ session_destroy();
 
 setcookie("remember_me", "", time() - 3600, "/");
 
-header("Location: ../views/Login.php");
+header("Location: ../views/login.php");
 exit();
 ?>
